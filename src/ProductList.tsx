@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +39,11 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   highlight: {
-    fontWeight: "700",
+    color: "#29302E",
+    fontWeight: "600",
+    fontSize: 20,
+    paddingHorizontal: 50,
+    paddingVertical: 50,
   },
 });
 
@@ -64,23 +68,27 @@ type productData = {
 };
 
 const ProductList: FC = () => {
-  const { idle, fetching, loading, data, error, refetch } =
-    useQuery<productData>(PRODUCTS);
+  // const { idle, fetching, loading, data, error, refetch } =
+  //   useQuery<productData>(PRODUCTS);
+
+  const [loadProducts, { called, loading, data }] =
+    useLazyQuery<productData>(PRODUCTS);
 
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View>
-          <Text style={styles.highlight}>Get Products with Apollo Client.</Text>
-          <Button title="Get Products" onPress={() => refetch()}></Button>
+          <Text style={styles.highlight}>
+            Get Products List with Apollo Client.
+          </Text>
+          <Button title="Get Products" onPress={() => loadProducts()}></Button>
         </View>
         {!data ? (
           <View>
-            <Text>No Data</Text>
+            <Text style={styles.dateText}>No Data</Text>
           </View>
         ) : (
           <View>
-            <Text style={styles.highlight}>Product List: </Text>
             <FlatList
               data={data.products}
               keyExtractor={(item) => String(item._id)}
