@@ -1,8 +1,47 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { IProduct } from "./product.Type";
-import { FlatList, Text, View } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  Text,
+  View,
+  Button,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 
 import { gql, useQuery } from "@apollo/client";
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dateText: {
+    color: "#29302E",
+    fontWeight: "600",
+    fontSize: 16,
+    paddingVertical: 20,
+  },
+  sectionContainer: {
+    marginTop: 32,
+    paddingHorizontal: 24,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+  },
+  sectionDescription: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: "400",
+  },
+  highlight: {
+    fontWeight: "700",
+  },
+});
 
 const PRODUCTS = gql`
   {
@@ -25,19 +64,36 @@ type productData = {
 };
 
 const ProductList: FC = () => {
-  const { loading, error, data } = useQuery<productData>(PRODUCTS);
+  const { idle, fetching, loading, data, error, refetch } =
+    useQuery<productData>(PRODUCTS);
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>Error:{error}</Text>;
-  if (!data) return <Text>No Data</Text>;
   return (
-    <FlatList
-      data={data.products}
-      keyExtractor={(item) => String(item._id)}
-      renderItem={({ item }) => (
-        <Text>{` Brand : ${item.brand}   - description : ${item.description}  `}</Text>
-      )}
-    />
+    <SafeAreaView>
+      <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <View>
+          <Text style={styles.highlight}>Get Products with Apollo Client.</Text>
+          <Button title="Get Products" onPress={() => refetch()}></Button>
+        </View>
+        {!data ? (
+          <View>
+            <Text>No Data</Text>
+          </View>
+        ) : (
+          <View>
+            <Text style={styles.highlight}>Product List: </Text>
+            <FlatList
+              data={data.products}
+              keyExtractor={(item) => String(item._id)}
+              renderItem={({ item }) => (
+                <Text
+                  style={styles.dateText}
+                >{` - Brand : ${item.brand}   - Description : ${item.description}   - Price : ${item.price}`}</Text>
+              )}
+            />
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

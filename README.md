@@ -1,4 +1,4 @@
-# Front end: React Native & Expo & Apollo Client GraphQl
+# Front end: React Native & Expo & Apollo Client GraphQL
 
 # front
 
